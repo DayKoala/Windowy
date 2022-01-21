@@ -46,8 +46,8 @@ class WindowFactory{
            return false;
         }
         $callback = $manager->getContainerOpenCallbacks();
-        if($callback->contains($callable = \Closure::fromCallable([self::class, 'sendContainer'])) === false){
-           $callback->add($callable);
+        if($callback->contains($closure = \Closure::fromCallable([self::class, 'sendContainer'])) === false){
+           $callback->add($closure);
         }
         return true;
     }
