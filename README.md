@@ -3,7 +3,6 @@
 </p>
 <p align="center">
   <img alt= "Last Commit" src= "https://img.shields.io/github/last-commit/DayKoala/Windowy?color=green">
-  <img alt= "Downloads" src= "https://img.shields.io/github/downloads/DayKoala/Windowy/latest/total">
 </p>
 
 # About
