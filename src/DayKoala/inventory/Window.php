@@ -1,5 +1,19 @@
 <?php
 
+/*
+ *  __          ___           _                     
+ *  \ \        / (_)         | |                    
+ *   \ \  /\  / / _ _ __   __| | _____      ___   _ 
+ *    \ \/  \/ / | | '_ \ / _` |/ _ \ \ /\ / / | | |
+ *     \  /\  /  | | | | | (_| | (_) \ V  V /| |_| |
+ *      \/  \/   |_|_| |_|\__,_|\___/ \_/\_/  \__, |
+ *                                             __/ |
+ *                                            |___/ 
+ * @author DayKoala
+ * @link https://github.com/DayKoala/Windowy
+ * 
+ */
+
 namespace DayKoala\inventory;
 
 use pocketmine\inventory\SimpleInventory;
@@ -8,32 +22,79 @@ use pocketmine\player\Player;
 
 use pocketmine\world\Position;
 
+use DayKoala\inventory\action\WindowTransaction;
+
 class Window extends SimpleInventory{
 
     use WindowTrait;
 
-    private $type;
+    private int $type;
 
-    protected $holder;
-    protected $position;
+    protected Player $holder;
+    protected Position $position;
 
-    protected $name;
+    protected string $name;
 
-    public function __construct(String $tile, Int $id, Int $size, Int $type){
-        parent::__construct($size);
+    protected ?\Closure $transaction = null;
 
+    protected bool $closed = false;
+
+    public function __construct(Int $type, Int $size, String $tile, Int $id){
         $this->type = $type;
+        parent::__construct($size);
 
         $this->writeAdditionalIds($tile, $id);
     }
 
-    public function initInventory(Player $player) : Void{
+    public function getType() : Int{
+        return $this->type;
+    }
 
-        $pos = $player->getPosition();
+    public function setHolder(Player $player) : Void{
+        $this->holder = $player;
+    }
 
-        $pos->x = $pos->getFloorX();
-        $pos->y = $pos->getFloorY() + 3;
-        $pos->z = $pos->getFloorZ();
+    public function getHolder() : Player{
+        return $this->holder;
+    }
+
+    public function getPosition() : Position{
+        return $this->position;
+    }
+
+    public function setName(String $name) : Void{
+        $this->name = $name;
+    }
+
+    public function getName() : String{
+        return $this->name;
+    }
+
+    public function hasTransaction() : Bool{
+        return (Bool) $this->transaction;
+    }
+
+    public function setTransaction(\Closure $closure) : Void{
+        $this->transaction = $closure;
+    }
+
+    public function processTransaction(WindowTransaction $action) : Bool{
+        if($this->transaction === null){
+           return false;
+        }
+        $transaction = $this->transaction;
+        return $transaction($action);
+    }
+
+    public function isClosed() : Bool{
+        return $this->closed;
+    }
+
+    public function initContainer(Player $player) : Void{
+        $this->holder = $player;
+
+        $pos = $player->getPosition()->floor();
+        $pos = new Position($pos->x, $pos->y + 3, $pos->z, $player->getWorld());
 
         $this->position = $pos;
 
@@ -41,8 +102,9 @@ class Window extends SimpleInventory{
 
         $nbt = $this->newNBT($pos, $this->name);
 
-        if($this->getSize() === 54){
-           $this->sendBlockPacket($player, $side = $pos->add(1, 0, 0));
+        if($this->getSize() === 54):
+            
+           $this->sendBlockPacket($player, $side = $pos->add(1, 0, 0), $this->block);
 
            $compound = $this->newNBT($side, $this->name)
 
@@ -58,45 +120,21 @@ class Window extends SimpleInventory{
            ->setInt("pairx", $side->x)
            ->setInt("pairz", $side->z);
 
-        }
+        endif;
 
         $this->replace[] = $player->getWorld()->getBlock($pos);
 
         $this->sendActorPacket($player, $pos, $nbt);
-
-        parent::onOpen($player);
     }
 
     public function onClose(Player $player) : Void{
         parent::onClose($player);
 
-        foreach($this->replace as $block) $this->sendBlockPacket($player, $block->getPosition(), $block);
+        foreach($this->replace as $block):
+           $this->sendBlockPacket($player, $block->getPosition(), $block);
+        endforeach;
 
-    }
-
-    public function getType() : Int{
-        return $this->type;
-    }
-
-    public function getHolder() : ?Player{
-        return $this->holder;
-    }
-
-    public function setHolder(Player $player) : Void{
-        $this->addContainerCallback($player);
-        $this->holder = $player;
-    }
-
-    public function getPosition() : ?Position{
-        return $this->position;
-    }
-
-    public function getName() : String{
-        return $this->name;
-    }
-
-    public function setName(String $name) : Void{
-        $this->name = $name;
+        $this->closed = true;
     }
 
 }

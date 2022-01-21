@@ -1,5 +1,19 @@
 <?php
 
+/*
+ *  __          ___           _                     
+ *  \ \        / (_)         | |                    
+ *   \ \  /\  / / _ _ __   __| | _____      ___   _ 
+ *    \ \/  \/ / | | '_ \ / _` |/ _ \ \ /\ / / | | |
+ *     \  /\  /  | | | | | (_| | (_) \ V  V /| |_| |
+ *      \/  \/   |_|_| |_|\__,_|\___/ \_/\_/  \__, |
+ *                                             __/ |
+ *                                            |___/ 
+ * @author DayKoala
+ * @link https://github.com/DayKoala/Windowy
+ * 
+ */
+
 namespace DayKoala\inventory;
 
 use pocketmine\block\tile\TileFactory;
@@ -13,7 +27,6 @@ use pocketmine\math\Vector3;
 
 use pocketmine\block\Block;
 
-use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 
@@ -29,20 +42,6 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\world\Position;
 
 trait WindowTrait{
-
-    protected static function createContainerOpen(Int $id, Window $inventory) : Array{
-        $inventory->initInventory($inventory->getHolder());
-
-        return [
-            ContainerOpenPacket::blockInv(
-                $id, 
-
-                $inventory->getType(), 
-
-                BlockPosition::fromVector3($inventory->getPosition())
-            )
-        ];
-    }
 
     protected $tile;
     protected $block;
@@ -95,18 +94,6 @@ trait WindowTrait{
         ->setInt(Tile::TAG_Z, $pos->z);
 
         return $nbt;
-    }
-
-    protected function addContainerCallback(Player $player) : Bool{
-        $manager = $player->getNetworkSession()->getInvManager();
-        if($manager === null){
-           return false;
-        }
-        $callback = $manager->getContainerOpenCallbacks();
-        if($callback->contains($callable = \Closure::fromCallable([self::class, 'createContainerOpen'])) === false){
-           $callback->add($callable);
-        }
-        return true;
     }
 
 }
