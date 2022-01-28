@@ -9,8 +9,8 @@
  *      \/  \/   |_|_| |_|\__,_|\___/ \_/\_/  \__, |
  *                                             __/ |
  *                                            |___/ 
- * @author DayKoala
- * @link https://github.com/DayKoala/Windowy
+ *  @author DayKoala
+ *  @link https://github.com/DayKoala/Windowy
  * 
  */
 
@@ -22,26 +22,29 @@ use pocketmine\player\Player;
 
 use pocketmine\world\Position;
 
+use DayKoala\inventory\holder\PlayerHolder;
+
 use DayKoala\inventory\action\WindowTransaction;
 
-class Window extends SimpleInventory{
+class Window extends SimpleInventory implements PlayerHolder{
 
     use WindowTrait;
 
     private int $type;
 
-    protected Player $holder;
+    protected ?Player $holder;
     protected Position $position;
 
     protected string $name;
 
     protected ?\Closure $transaction = null;
 
-    protected bool $closed = false;
+    protected bool $closed = true;
 
     public function __construct(Int $type, Int $size, String $tile, Int $id){
-        $this->type = $type;
         parent::__construct($size);
+
+        $this->type = $type;
 
         $this->writeAdditionalIds($tile, $id);
     }
@@ -54,7 +57,7 @@ class Window extends SimpleInventory{
         $this->holder = $player;
     }
 
-    public function getHolder() : Player{
+    public function getHolder() : ?Player{
         return $this->holder;
     }
 
@@ -78,20 +81,21 @@ class Window extends SimpleInventory{
         $this->transaction = $closure;
     }
 
-    public function processTransaction(WindowTransaction $action) : Bool{
-        if($this->transaction === null){
-           return false;
-        }
-        $transaction = $this->transaction;
-        return $transaction($action);
+    public function getTransaction() : ?\Closure{
+        return $this->transaction;
     }
 
     public function isClosed() : Bool{
         return $this->closed;
     }
 
-    public function initContainer(Player $player) : Void{
-        $this->holder = $player;
+    public function initContainer(Player $player) : Bool{
+        if($this->holder === null){
+           return false;
+        }
+        $this->closed = false;
+
+        $player = $this->holder;
 
         $pos = $player->getPosition()->floor();
         $pos = new Position($pos->x, $pos->y + 3, $pos->z, $player->getWorld());
@@ -125,6 +129,8 @@ class Window extends SimpleInventory{
         $this->replace[] = $player->getWorld()->getBlock($pos);
 
         $this->sendActorPacket($player, $pos, $nbt);
+
+        return true;
     }
 
     public function onClose(Player $player) : Void{

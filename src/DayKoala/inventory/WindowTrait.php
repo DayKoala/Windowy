@@ -9,8 +9,8 @@
  *      \/  \/   |_|_| |_|\__,_|\___/ \_/\_/  \__, |
  *                                             __/ |
  *                                            |___/ 
- * @author DayKoala
- * @link https://github.com/DayKoala/Windowy
+ *  @author DayKoala
+ *  @link https://github.com/DayKoala/Windowy
  * 
  */
 

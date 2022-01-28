@@ -9,14 +9,16 @@
  *      \/  \/   |_|_| |_|\__,_|\___/ \_/\_/  \__, |
  *                                             __/ |
  *                                            |___/ 
- * @author DayKoala
- * @link https://github.com/DayKoala/Windowy
+ *  @author DayKoala
+ *  @link https://github.com/DayKoala/Windowy
  * 
  */
 
-namespace DayKoala\inventory;
+namespace DayKoala\inventory\tile;
 
 use pocketmine\network\mcpe\protocol\ContainerSetDataPacket;
+
+use DayKoala\inventory\Window;
 
 class FurnaceWindow extends Window{
 

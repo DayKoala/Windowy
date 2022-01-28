@@ -9,8 +9,8 @@
  *      \/  \/   |_|_| |_|\__,_|\___/ \_/\_/  \__, |
  *                                             __/ |
  *                                            |___/ 
- * @author DayKoala
- * @link https://github.com/DayKoala/Windowy
+ *  @author DayKoala
+ *  @link https://github.com/DayKoala/Windowy
  * 
  */
 
@@ -31,25 +31,26 @@ use pocketmine\block\BlockLegacyIds;
 
 use pocketmine\player\Player;
 
-class WindowFactory{
+use DayKoala\inventory\tile\FurnaceWindow;
+
+final class WindowFactory{
 
     use SingletonTrait;
 
-    protected static function sendContainer(Int $id, Window $inventory) : Array{
-        $inventory->initContainer($inventory->getHolder());
-        return [ContainerOpenPacket::blockInv($id, $inventory->getType(), BlockPosition::fromVector3($inventory->getPosition()))];
-    }
-
     private static function addContainer(Player $player) : Bool{
         $manager = $player->getNetworkSession()->getInvManager();
-        if($manager === null){
-           return false;
-        }
+
+        if($manager === null) return false;
+        
         $callback = $manager->getContainerOpenCallbacks();
-        if($callback->contains($closure = \Closure::fromCallable([self::class, 'sendContainer'])) === false){
-           $callback->add($closure);
-        }
+
+        if($callback->contains($closure = \Closure::fromCallable([self::class, 'sendContainer'])) === false) $callback->add($closure);
+
         return true;
+    }
+
+    private static function sendContainer(Int $id, Window $inventory) : Array{
+        return $inventory->initContainer() ? [ContainerOpenPacket::blockInv($id, $inventory->getType(), BlockPosition::fromVector3($inventory->getPosition()))] : [];
     }
 
     public const CHEST = "Chest";
@@ -65,8 +66,24 @@ class WindowFactory{
         $this->register(self::FURNACE, new FurnaceWindow(WindowTypes::FURNACE, 3, NormalFurnace::class, BlockLegacyIds::FURNACE));
     }
 
+    public function getWindow(Player $player, String $id, String $name = "Window") : ?Window{
+        if(isset($this->windows[$id]) === false or self::addContainer($player) === false){
+           return null;
+        }
+        $window = clone $this->windows[$id];
+
+        $window->setHolder($player);
+        $window->setName($name);
+
+        return $window;
+    }
+
     public function exists(String $id) : Bool{
         return isset($this->windows[$id]);
+    }
+
+    public function get(String $id) : ?Window{
+        return $this->windows[$id] ?? null;
     }
 
     public function register(String $id, Window $inventory, Bool $override = false) : Void{
@@ -76,14 +93,8 @@ class WindowFactory{
         $this->windows[$id] = $inventory;
     }
 
-    public function get(Player $player, String $id, String $name = "Window") : ?Window{
-        if(isset($this->windows[$id]) === false or self::addContainer($player) === false){
-           return null;
-        }
-        $window = clone $this->windows[$id];
-        $window->setHolder($player);
-        $window->setName($name);
-        return $window;
+    public function unregister(String $id) : Void{
+        if(isset($this->windows[$id])) unset($this->windows[$id]);
     }
 
 }
