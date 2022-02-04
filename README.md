@@ -28,7 +28,7 @@ $id = WindowFactory::FURNACE;
 
 ```php
 
-$window = WindowFactory::getInstance()->get($player, $id, $name);
+$window = WindowFactory::getInstance()->getWindow($player, $id, $name);
 
 ```
 
