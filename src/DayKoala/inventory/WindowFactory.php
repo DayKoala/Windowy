@@ -58,7 +58,7 @@ final class WindowFactory{
 
     public const FURNACE = "Furnace";
 
-    protected $windows = [];
+    private $windows = [];
 
     public function __construct(){
         $this->register(self::CHEST, new Window(WindowTypes::CONTAINER, 27, Chest::class, BlockLegacyIds::CHEST));

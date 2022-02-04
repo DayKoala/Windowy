@@ -30,7 +30,7 @@ class WindowTransaction{
 
     public static function sendAction(Window $inventory,  SlotChangeAction $action, InventoryTransactionEvent $event) : Bool{
         $transaction = $inventory->getTransaction() ?? null;
-        return $transaction ? $transaction($inventory, $action->getSlot(), $action->getTargetItem(), $action->getSourceItem(), $event) : false;
+        return $transaction ? $transaction(new self($inventory, $action->getSlot(), $action->getTargetItem(), $action->getSourceItem(), $event)) : false;
     }
 
     protected Window $inventory;
@@ -47,10 +47,10 @@ class WindowTransaction{
         $this->inventory = $window;
         $this->player = $window->getHolder();
 
+        $this->slot = $slot;
+
         $this->target = $target;
         $this->source = $source;
-
-        $this->slot = $slot;
 
         $this->event = $event;
     }

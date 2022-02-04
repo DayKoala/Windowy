@@ -30,7 +30,7 @@ class Window extends SimpleInventory implements PlayerHolder{
 
     use WindowTrait;
 
-    private int $type;
+    private $type;
 
     protected ?Player $holder;
     protected Position $position;
@@ -89,7 +89,7 @@ class Window extends SimpleInventory implements PlayerHolder{
         return $this->closed;
     }
 
-    public function initContainer(Player $player) : Bool{
+    public function initContainer() : Bool{
         if($this->holder === null){
            return false;
         }
@@ -98,9 +98,7 @@ class Window extends SimpleInventory implements PlayerHolder{
         $player = $this->holder;
 
         $pos = $player->getPosition()->floor();
-        $pos = new Position($pos->x, $pos->y + 3, $pos->z, $player->getWorld());
-
-        $this->position = $pos;
+        $pos = $this->position = new Position($pos->x, $pos->y + 3, $pos->z, $player->getWorld());
 
         $this->sendBlockPacket($player, $pos);
 
@@ -136,9 +134,7 @@ class Window extends SimpleInventory implements PlayerHolder{
     public function onClose(Player $player) : Void{
         parent::onClose($player);
 
-        foreach($this->replace as $block):
-           $this->sendBlockPacket($player, $block->getPosition(), $block);
-        endforeach;
+        foreach($this->replace as $block) $this->sendBlockPacket($player, $block->getPosition(), $block);
 
         $this->closed = true;
     }
