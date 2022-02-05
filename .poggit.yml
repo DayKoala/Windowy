@@ -5,4 +5,5 @@ branches:
 projects:
   Windowy:
     path: ""
+    icon: icon.png
 ...
