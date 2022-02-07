@@ -24,20 +24,19 @@ use pocketmine\world\Position;
 
 use DayKoala\inventory\holder\PlayerHolder;
 
+use DayKoala\inventory\action\WindowTransactionTrait;
 use DayKoala\inventory\action\WindowTransaction;
 
 class Window extends SimpleInventory implements PlayerHolder{
 
-    use WindowTrait;
+    use WindowTrait, WindowTransactionTrait;
 
-    private $type;
+    private int $type;
 
     protected ?Player $holder;
     protected Position $position;
 
     protected string $name;
-
-    protected ?\Closure $transaction = null;
 
     protected bool $closed = true;
 
@@ -45,6 +44,7 @@ class Window extends SimpleInventory implements PlayerHolder{
         parent::__construct($size);
 
         $this->type = $type;
+        $this->position = new Position(0, 0, 0, null);
 
         $this->writeAdditionalIds($tile, $id);
     }
@@ -73,18 +73,6 @@ class Window extends SimpleInventory implements PlayerHolder{
         return $this->name;
     }
 
-    public function hasTransaction() : Bool{
-        return (Bool) $this->transaction;
-    }
-
-    public function setTransaction(\Closure $closure) : Void{
-        $this->transaction = $closure;
-    }
-
-    public function getTransaction() : ?\Closure{
-        return $this->transaction;
-    }
-
     public function isClosed() : Bool{
         return $this->closed;
     }
@@ -93,8 +81,6 @@ class Window extends SimpleInventory implements PlayerHolder{
         if($this->holder === null){
            return false;
         }
-        $this->closed = false;
-
         $player = $this->holder;
 
         $pos = $player->getPosition()->floor();
@@ -105,15 +91,15 @@ class Window extends SimpleInventory implements PlayerHolder{
         $nbt = $this->newNBT($pos, $this->name);
 
         if($this->getSize() === 54):
+
+           $this->replace[] = $player->getWorld()->getBlock($side = $pos->add(1, 0, 0));
             
-           $this->sendBlockPacket($player, $side = $pos->add(1, 0, 0), $this->block);
+           $this->sendBlockPacket($player, $side, $this->block);
 
            $compound = $this->newNBT($side, $this->name)
 
            ->setInt("pairx", $pos->x)
            ->setInt("pairz", $pos->z);
-
-           $this->replace[] = $player->getWorld()->getBlock($side);
 
            $this->sendActorPacket($player, $side, $compound);
 
@@ -128,14 +114,17 @@ class Window extends SimpleInventory implements PlayerHolder{
 
         $this->sendActorPacket($player, $pos, $nbt);
 
+        $this->closed = false;
         return true;
     }
 
     public function onClose(Player $player) : Void{
         parent::onClose($player);
 
-        foreach($this->replace as $block) $this->sendBlockPacket($player, $block->getPosition(), $block);
-
+        foreach($this->replace as $block){
+           $this->sendBlockPacket($player, $block->getPosition(), $block);
+        }
+        $this->position = new Position(0, 0, 0, null);
         $this->closed = true;
     }
 

@@ -50,7 +50,7 @@ trait WindowTrait{
 
     protected function writeAdditionalIds(String $tile, Int $id) : Void{
         $this->tile = TileFactory::getInstance()->getSaveId($tile);
-        $this->block = BlockFactory::getInstance()->get($id, 0);
+        $this->block = BlockFactory::getInstance()->get($id, 1);
     }
 
     protected function sendBlockPacket(Player $player, Vector3 $pos, ?Block $block = null) : Void{

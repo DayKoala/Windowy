@@ -45,13 +45,14 @@ class Windowy extends PluginBase implements Listener{
         $window = null;
         foreach($event->getTransaction()->getActions() as $action){
            if($action instanceof SlotChangeAction):
-              if($action->getInventory() instanceof Window){
-                 $window = $action->getInventory();
+              $inventory = $action->getInventory();
+              if($inventory instanceof Window){
+                 $window = $inventory;
                  break;
               }
            endif;
         }
-        if($window) WindowTransaction::sendAction($window, $action, $event);
+        if($window) WindowTransaction::sendTransaction($window, $action, $event);
     }
 
 }

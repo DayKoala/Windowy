@@ -26,6 +26,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 
 use pocketmine\block\tile\Chest;
 use pocketmine\block\tile\NormalFurnace;
+use pocketmine\block\tile\Hopper;
 
 use pocketmine\block\BlockLegacyIds;
 
@@ -58,11 +59,14 @@ final class WindowFactory{
 
     public const FURNACE = "Furnace";
 
+    public const HOPPER = "Hopper";
+
     private $windows = [];
 
     public function __construct(){
         $this->register(self::CHEST, new Window(WindowTypes::CONTAINER, 27, Chest::class, BlockLegacyIds::CHEST));
         $this->register(self::DOUBLE_CHEST, new Window(WindowTypes::CONTAINER, 54, Chest::class, BlockLegacyIds::CHEST));
+        $this->register(self::HOPPER, new Window(WindowTypes::HOPPER, 5, Hopper::class, BlockLegacyIds::HOPPER_BLOCK));
         $this->register(self::FURNACE, new FurnaceWindow(WindowTypes::FURNACE, 3, NormalFurnace::class, BlockLegacyIds::FURNACE));
     }
 

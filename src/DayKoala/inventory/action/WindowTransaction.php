@@ -28,9 +28,11 @@ use DayKoala\inventory\Window;
 
 class WindowTransaction{
 
-    public static function sendAction(Window $inventory,  SlotChangeAction $action, InventoryTransactionEvent $event) : Bool{
-        $transaction = $inventory->getTransaction() ?? null;
-        return $transaction ? $transaction(new self($inventory, $action->getSlot(), $action->getTargetItem(), $action->getSourceItem(), $event)) : false;
+    public static function sendTransaction(Window $inventory, SlotChangeAction $action, InventoryTransactionEvent $event) : Void{
+        $transaction = $inventory->getTransaction();
+        if($transaction):
+           $transaction(new WindowTransaction($inventory, $action->getSlot(), $action->getTargetItem(), $action->getSourceItem(), $event));
+        endif;
     }
 
     protected Window $inventory;
@@ -41,7 +43,7 @@ class WindowTransaction{
     protected Item $target;
     protected Item $source;
 
-    protected InventoryTransactionEvent $event;
+    private InventoryTransactionEvent $event;
 
     protected function __construct(Window $window, Int $slot, Item $target, Item $source, InventoryTransactionEvent $event){
         $this->inventory = $window;
