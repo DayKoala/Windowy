@@ -62,6 +62,8 @@ use DayKoala\inventory\action\WindowTransaction;
 $transaction = function(WindowTransaction $action){
    $player = $action->getPlayer();
    $player->sendMessage("I won't let you take this item haha!");
+   
+   $action->cancel();
 };
 
 $window->setTransaction($transaction);
