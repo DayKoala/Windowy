@@ -12,7 +12,7 @@
 
 # How to use
 
-- Windowy comes with 3 registered inventories
+- Windowy comes with 4 registered inventories
 
 ```php
 
@@ -21,6 +21,7 @@ use DayKoala\inventory\WindowFactory;
 $id = WindowFactory::CHEST;
 $id = WindowFactory::DOUBLE_CHEST;
 $id = WindowFactory::FURNACE;
+$id = WindowFactory::HOPPER;
 
 ```
 
@@ -58,10 +59,11 @@ $window = new MyWindow(WindowTypes::CONTAINER, 27, Tile:class, BlockLegacyIds::B
 
 use DayKoala\inventory\action\WindowTransaction;
 
-$transaction = function(WindowTransaction $action) : Bool{
+$transaction = function(WindowTransaction $action){
    $player = $action->getPlayer();
    $player->sendMessage("I won't let you take this item haha!");
-   return false;
+   
+   $action->cancel();
 };
 
 $window->setTransaction($transaction);
