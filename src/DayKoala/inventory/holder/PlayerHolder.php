@@ -22,6 +22,6 @@ interface PlayerHolder{
 
     public function getHolder() : ?Player;
 
-    public function setHolder(Player $player) : Void; 
+    public function setHolder(Player $player); 
 
 }

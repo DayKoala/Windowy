@@ -16,84 +16,63 @@
 
 namespace DayKoala\inventory;
 
-use pocketmine\block\tile\TileFactory;
-use pocketmine\block\tile\Tile;
-
-use pocketmine\block\BlockFactory;
-
 use pocketmine\player\Player;
-
-use pocketmine\math\Vector3;
-
-use pocketmine\block\Block;
-
-use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
-use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
-
-use pocketmine\network\mcpe\protocol\types\BlockPosition;
-use pocketmine\network\mcpe\protocol\types\CacheableNbt;
-
-use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
-
-use pocketmine\Server;
-
-use pocketmine\nbt\tag\CompoundTag;
 
 use pocketmine\world\Position;
 
+use DayKoala\block\BlockEntityMetadata;
+
 trait WindowTrait{
 
-    protected $tile;
-    protected $block;
+    protected $network;
+    protected $size;
 
-    protected $replace;
+    protected $metadata;
 
-    protected function writeAdditionalIds(String $tile, Int $id) : Void{
-        $this->tile = TileFactory::getInstance()->getSaveId($tile);
-        $this->block = BlockFactory::getInstance()->get($id, 1);
+    protected $holder = null;
+    protected $position = null;
+
+    protected $name = null;
+
+    public function getNetworkType() : Int{
+        return $this->network;
     }
 
-    protected function sendBlockPacket(Player $player, Vector3 $pos, ?Block $block = null) : Void{
-        $block = $block ?? $this->block;
-
-        $packet = UpdateBlockPacket::create(
-
-            BlockPosition::fromVector3($pos), 
-
-            RuntimeBlockMapping::getInstance()->toRuntimeId($block->getFullId()), 
-
-            UpdateBlockPacket::FLAG_NETWORK, 
-            UpdateBlockPacket::DATA_LAYER_NORMAL
-
-        );
-        Server::getInstance()->broadcastPackets([$player], [$packet]);
+    public function getDefaultSize() : Int{
+        return $this->size;
     }
 
-    protected function sendActorPacket(Player $player, Vector3 $pos, CompoundTag $nbt = null) : Void{
-        $nbt = $nbt ?? $this->newNBT($pos);
-
-        $packet = BlockActorDataPacket::create(
-
-            BlockPosition::fromVector3($pos),
-            
-            new CacheableNbt($nbt)
-
-        );
-        Server::getInstance()->broadcastPackets([$player], [$packet]);
+    public function getMetadata() : BlockEntityMetadata{
+        return $this->metadata;
     }
 
-    protected function newNBT(Vector3 $pos, String $name = "Window") : CompoundTag{
-        $nbt = CompoundTag::create()
-        
-        ->setString("CustomName", $name)
+    public function getHolder() : ?Player{
+        return $this->holder;
+    }
 
-        ->setString(Tile::TAG_ID, $this->tile)
+    public function setHolder(Player $player) : self{
+        $this->holder = $holder;
+        return $this;
+    }
 
-        ->setInt(Tile::TAG_X, $pos->x)
-        ->setInt(Tile::TAG_Y, $pos->y)
-        ->setInt(Tile::TAG_Z, $pos->z);
+    public function getPosition() : ?Position{
+        return $this->position;
+    }
 
-        return $nbt;
+    public function setPosition(Position $pos) : Position{
+        $pos->x = $pos->getFloorX();
+        $pos->y = $pos->getFloorY() + 3;
+        $pos->z = $pos->getFloorZ();
+        return $this->position = $pos;
+    }
+
+    public function getName() : String{
+        return $this->name ?? "Unknown";
+    }
+
+    public function setName(String $name) : self{
+        $this->name = $name;
+        return $this;
     }
 
 }

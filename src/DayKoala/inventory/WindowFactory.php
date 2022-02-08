@@ -32,62 +32,65 @@ use pocketmine\block\BlockLegacyIds;
 
 use pocketmine\player\Player;
 
+use DayKoala\block\BlockEntityMetadata;
+
 use DayKoala\inventory\tile\FurnaceWindow;
 
 final class WindowFactory{
 
     use SingletonTrait;
 
-    private static function addContainer(Player $player) : Bool{
+    public static function writeContainer(Player $player) : Bool{
         $manager = $player->getNetworkSession()->getInvManager();
-
-        if($manager === null) return false;
-        
+        if($manager === null){
+           return false;
+        }
+        $callable = function(Int $id, Window $inventory) use ($player) : Array{
+            $pos = $inventory->setPosition($player->getPosition());
+            $packets = $inventory->getMetadata()->create(
+                $pos, 
+                $inventory->getDefaultSize() == 54 ? $pos->add(1, 0, 0) : null,
+                $inventory->getName()
+            );
+            $packets[] = ContainerOpenPacket::blockInv($id, $inventory->getNetworkType(), BlockPosition::fromVector3($pos));
+            return $packets;
+        };
         $callback = $manager->getContainerOpenCallbacks();
 
-        if($callback->contains($closure = \Closure::fromCallable([self::class, 'sendContainer'])) === false) $callback->add($closure);
-
+        if($callback->contains($closure = \Closure::fromCallable($callable)) === false) $callback->add($closure);
+        
         return true;
-    }
-
-    private static function sendContainer(Int $id, Window $inventory) : Array{
-        return $inventory->initContainer() ? [ContainerOpenPacket::blockInv($id, $inventory->getType(), BlockPosition::fromVector3($inventory->getPosition()))] : [];
     }
 
     public const CHEST = "Chest";
     public const DOUBLE_CHEST = "Double_Chest";
 
-    public const FURNACE = "Furnace";
-
     public const HOPPER = "Hopper";
+
+    public const FURNACE = "Furnace";
 
     private $windows = [];
 
     public function __construct(){
-        $this->register(self::CHEST, new Window(WindowTypes::CONTAINER, 27, Chest::class, BlockLegacyIds::CHEST));
-        $this->register(self::DOUBLE_CHEST, new Window(WindowTypes::CONTAINER, 54, Chest::class, BlockLegacyIds::CHEST));
-        $this->register(self::HOPPER, new Window(WindowTypes::HOPPER, 5, Hopper::class, BlockLegacyIds::HOPPER_BLOCK));
-        $this->register(self::FURNACE, new FurnaceWindow(WindowTypes::FURNACE, 3, NormalFurnace::class, BlockLegacyIds::FURNACE));
-    }
-
-    public function getWindow(Player $player, String $id, String $name = "Window") : ?Window{
-        if(isset($this->windows[$id]) === false or self::addContainer($player) === false){
-           return null;
-        }
-        $window = clone $this->windows[$id];
-
-        $window->setHolder($player);
-        $window->setName($name);
-
-        return $window;
+        $this->register(self::CHEST, new Window(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
+        $this->register(self::DOUBLE_CHEST, new Window(WindowTypes::CONTAINER, 54, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
+        $this->register(self::HOPPER, new Window(WindowTypes::HOPPER, 5, new BlockEntityMetadata(Hopper::class, BlockLegacyIds::HOPPER_BLOCK)));
+        $this->register(self::FURNACE, new FurnaceWindow(WindowTypes::FURNACE, 3, new BlockEntityMetadata(NormalFurnace::class, BlockLegacyIds::FURNACE)));
     }
 
     public function exists(String $id) : Bool{
         return isset($this->windows[$id]);
     }
 
-    public function get(String $id) : ?Window{
-        return $this->windows[$id] ?? null;
+    public function get(String $id, ?String $name = null) : ?Window{
+        if(isset($this->windows[$id]) === false){
+           return null;
+        }
+        $window = clone $this->windows[$id];
+
+        if(is_string($name)) $window->setName($name);
+        
+        return $window;
     }
 
     public function register(String $id, Window $inventory, Bool $override = false) : Void{
