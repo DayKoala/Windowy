@@ -29,7 +29,7 @@ $id = WindowFactory::HOPPER;
 
 ```php
 
-$window = WindowFactory::getInstance()->getWindow($player, $id, $name);
+$window = WindowFactory::getInstance()->get($id, $name);
 
 ```
 
@@ -39,7 +39,7 @@ $window = WindowFactory::getInstance()->getWindow($player, $id, $name);
 
 use DayKoala\Windowy;
 
-$window = Windowy::getWindow($player, $id, $name);
+$window = Windowy::getWindow($id, $name);
 
 ```
 
@@ -49,7 +49,9 @@ $window = Windowy::getWindow($player, $id, $name);
 
 ```php
 
-$window = new MyWindow(WindowTypes::CONTAINER, 27, Tile:class, BlockLegacyIds::Block);
+use DayKoala\block\BlockEntityMetadata;
+
+$window = new MyWindow(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Tile:class, BlockLegacyIds::Block));
 
 ```
 
@@ -61,6 +63,7 @@ use DayKoala\inventory\action\WindowTransaction;
 
 $transaction = function(WindowTransaction $action){
    $player = $action->getPlayer();
+   
    $player->sendMessage("I won't let you take this item haha!");
    
    $action->cancel();
