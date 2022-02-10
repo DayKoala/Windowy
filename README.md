@@ -51,7 +51,7 @@ $window = Windowy::getWindow($id, $name);
 
 use DayKoala\block\BlockEntityMetadata;
 
-$window = new MyWindow(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Tile:class, BlockLegacyIds::Block));
+$window = new MyWindow(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Tile::class, BlockLegacyIds::Block));
 
 ```
 
