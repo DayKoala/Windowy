@@ -55,10 +55,10 @@ class BlockEntityMetadata{
         return $packets;
     }
 
-    public function remove(Position $pos, ?Vector3 $pair) : Array{
+    public function remove(Position $pos, ?Vector3 $pair = null) : Array{
         $packets = [$this->writeBlock($pos, $pos->getWorld()->getBlock($pos))];
         if($pair instanceof Vector3){
-           $packets[] = $this->writeBlock($pos, $pos->getWorld()->getBlock($pair));
+           $packets[] = $this->writeBlock($pair, $pos->getWorld()->getBlock($pair));
         }
         return $packets;
     }

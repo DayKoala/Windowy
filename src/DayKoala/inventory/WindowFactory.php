@@ -18,6 +18,8 @@ namespace DayKoala\inventory;
 
 use pocketmine\utils\SingletonTrait;
 
+use pocketmine\world\Position;
+
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
@@ -35,45 +37,57 @@ use pocketmine\player\Player;
 use DayKoala\block\BlockEntityMetadata;
 
 use DayKoala\inventory\tile\FurnaceWindow;
+use DayKoala\inventory\tile\DoubleChestWindow;
 
 final class WindowFactory{
 
     use SingletonTrait;
+
+    public static function toWindowPosition(Position $pos) : Position{
+        $pos->x = $pos->getFloorX();
+        $pos->y = $pos->getFloorY() + 3;
+        $pos->z = $pos->getFloorZ();
+        return $pos;
+    }
 
     public static function writeContainer(Player $player) : Bool{
         $manager = $player->getNetworkSession()->getInvManager();
         if($manager === null){
            return false;
         }
-        $callable = function(Int $id, Window $inventory) use ($player) : Array{
-            $pos = $inventory->setPosition($player->getPosition());
-            $packets = $inventory->getMetadata()->create(
-                $pos, 
-                $inventory->getDefaultSize() == 54 ? $pos->add(1, 0, 0) : null,
-                $inventory->getName()
-            );
-            $packets[] = ContainerOpenPacket::blockInv($id, $inventory->getNetworkType(), BlockPosition::fromVector3($pos));
-            return $packets;
+        $closure = function(Int $id, Window $inventory) use ($player) : Array{
+            $pos = self::toWindowPosition($player->getPosition());
+
+            if($inventory instanceof DoubleChestWindow):
+               $inventory->setPair($pair = $pos->add(1, 0, 0));
+            else:
+               $pair = null;
+            endif;
+            
+            $inventory->setPosition($pos);
+            foreach($inventory->getMetadata()->create($pos, $pair, $inventory->hasName() ? $inventory->getName() : null) as $packet){
+               $player->getNetworkSession()->sendDataPacket($packet, true);
+            }
+            
+            return [ContainerOpenPacket::blockInv($id, $inventory->getNetworkType(), BlockPosition::fromVector3($pair ?? $pos))];
         };
         $callback = $manager->getContainerOpenCallbacks();
 
-        if($callback->contains($closure = \Closure::fromCallable($callable)) === false) $callback->add($closure);
-        
+        if($callback->contains($closure) === false) $callback->add($closure);
+
         return true;
     }
 
     public const CHEST = "Chest";
     public const DOUBLE_CHEST = "Double_Chest";
-
     public const HOPPER = "Hopper";
-
     public const FURNACE = "Furnace";
 
     private $windows = [];
 
     public function __construct(){
         $this->register(self::CHEST, new Window(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
-        $this->register(self::DOUBLE_CHEST, new Window(WindowTypes::CONTAINER, 54, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
+        $this->register(self::DOUBLE_CHEST, new DoubleChestWindow(WindowTypes::CONTAINER, 54, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
         $this->register(self::HOPPER, new Window(WindowTypes::HOPPER, 5, new BlockEntityMetadata(Hopper::class, BlockLegacyIds::HOPPER_BLOCK)));
         $this->register(self::FURNACE, new FurnaceWindow(WindowTypes::FURNACE, 3, new BlockEntityMetadata(NormalFurnace::class, BlockLegacyIds::FURNACE)));
     }

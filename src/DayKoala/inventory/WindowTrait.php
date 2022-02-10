@@ -31,6 +31,7 @@ trait WindowTrait{
 
     protected $holder = null;
     protected $position = null;
+    protected $pair = null;
 
     protected $name = null;
 
@@ -59,11 +60,13 @@ trait WindowTrait{
         return $this->position;
     }
 
-    public function setPosition(Position $pos) : Position{
-        $pos->x = $pos->getFloorX();
-        $pos->y = $pos->getFloorY() + 3;
-        $pos->z = $pos->getFloorZ();
-        return $this->position = $pos;
+    public function setPosition(Position $pos) : self{
+        $this->position = $pos;
+        return $this;
+    }
+
+    public function hasName() : Bool{
+        return (Bool) $this->name;
     }
 
     public function getName() : String{

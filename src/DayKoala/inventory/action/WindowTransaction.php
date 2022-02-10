@@ -29,10 +29,13 @@ use DayKoala\inventory\Window;
 class WindowTransaction{
 
     public static function sendTransaction(Window $inventory, SlotChangeAction $action, InventoryTransactionEvent $event) : Void{
-        $transaction = $inventory->getTransaction();
-        if($transaction):
-           $transaction(new WindowTransaction($inventory, $action->getSlot(), $action->getTargetItem(), $action->getSourceItem(), $event));
-        endif;
+        $source = $action->getSourceItem();
+        if($inventory->hasItemTransaction($source)){
+           $transaction = $inventory->getItemTransaction($source);
+        }else{
+           $transaction = $inventory->getTransaction();
+        }
+        if($transaction) $transaction(new WindowTransaction($inventory, $action->getSlot(), $action->getTargetItem(), $source, $event));
     }
 
     protected Window $inventory;

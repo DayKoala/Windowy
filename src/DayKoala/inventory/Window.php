@@ -17,6 +17,9 @@
 namespace DayKoala\inventory;
 
 use pocketmine\inventory\SimpleInventory;
+use pocketmine\inventory\InventoryHolder;
+
+use pocketmine\item\Item;
 
 use pocketmine\player\Player;
 
@@ -26,7 +29,9 @@ use DayKoala\inventory\action\WindowTransactionTrait;
 
 use DayKoala\block\BlockEntityMetadata;
 
-class Window extends SimpleInventory implements PlayerHolder{
+use DayKoala\inventory\tile\DoubleChestWindow;
+
+class Window extends SimpleInventory implements PlayerHolder, InventoryHolder{
 
     use WindowTrait, WindowTransactionTrait;
 
@@ -38,6 +43,35 @@ class Window extends SimpleInventory implements PlayerHolder{
 
         $this->network = $network;
         $this->metadata = $metadata;
+    }
+
+    public function getInventory(){
+        return $this;
+    }
+
+    public function setItem(Int $slot, Item $item, ?\Closure $closure = null) : Void{
+        $target = $this->getItem($slot);
+        if($target->equalsExact($item) === false){
+
+           if($this->hasItemTransaction($target)) $this->removeItemTransaction($target);
+
+        }
+        parent::setItem($slot, $item);
+
+        if($closure) $this->setItemTransaction($item, $closure);
+    }
+
+    public function onContentChange(Array $items) : Void{
+        foreach($items as $slot => $item):
+           if(!$this->hasItemTransaction($item)){
+              continue;
+           }
+           $target = $this->getItem($slot);
+           if(!$target->equalsExact($item)){
+              continue;
+           }
+           $this->removeItemTransaction($target);
+        endforeach;
     }
 
     public function onOpen(Player $who) : Void{
@@ -54,11 +88,9 @@ class Window extends SimpleInventory implements PlayerHolder{
         if($this->position){
            $packets = $this->metadata->remove(
                $this->position,
-               $this->size == 54 ? $this->position->add(1, 0, 0) : null
+               $this->size == 54 ? $this?->getPair() : null
            );
-           foreach($packets as $packet):
-              $who->getNetworkSession()->sendDataPacket($packet);
-           endforeach;
+           foreach($packets as $packet) $who->getNetworkSession()->sendDataPacket($packet);
         }
         $this->closed = true;
     }
