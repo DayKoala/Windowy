@@ -49,7 +49,7 @@ $window = Windowy::getWindow($id, $name);
 
 # Registering your Window
 
-- You need the inventory you are going to log in to be a ``Window extension``, otherwise it won't work. Register ``your inventory`` like this:
+- You need the inventory you are going to register to be a ``Window extension``, otherwise it won't work. Register ``your inventory`` like this:
  
 ```php
 
