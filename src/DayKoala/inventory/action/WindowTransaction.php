@@ -28,18 +28,31 @@ use DayKoala\inventory\Window;
 
 class WindowTransaction{
 
+    public const TYPE_INVENTORY = 1;
+
+    public const TYPE_TARGET = 2;
+    public const TYPE_SOURCE = 3;
+
     public static function sendTransaction(Window $inventory, SlotChangeAction $action, InventoryTransactionEvent $event) : Void{
+        $target = $action->getTargetItem();
         $source = $action->getSourceItem();
-        if($inventory->hasItemTransaction($source)){
+        if($inventory->hasItemTransaction($target)){
+           $transaction = $inventory->getItemTransaction($target);
+           $type = self::TYPE_TARGET;
+        }elseif($inventory->hasItemTransaction($source)){
            $transaction = $inventory->getItemTransaction($source);
+           $type = self::TYPE_SOURCE;
         }else{
            $transaction = $inventory->getTransaction();
+           $type = self::TYPE_INVENTORY;
         }
-        if($transaction) $transaction(new WindowTransaction($inventory, $action->getSlot(), $action->getTargetItem(), $source, $event));
+        if($transaction) $transaction(new WindowTransaction($inventory, $type, $action->getSlot(), $target, $source, $event));
     }
 
     protected Window $inventory;
     protected Player $player;
+
+    protected int $type;
 
     protected int $slot;
 
@@ -48,9 +61,11 @@ class WindowTransaction{
 
     private InventoryTransactionEvent $event;
 
-    protected function __construct(Window $window, Int $slot, Item $target, Item $source, InventoryTransactionEvent $event){
+    protected function __construct(Window $window, Int $type, Int $slot, Item $target, Item $source, InventoryTransactionEvent $event){
         $this->inventory = $window;
         $this->player = $window->getHolder();
+
+        $this->type = $type;
 
         $this->slot = $slot;
 
@@ -66,6 +81,10 @@ class WindowTransaction{
 
     public function getInventory() : Window{
         return $this->inventory;
+    }
+
+    public function getType() : Int{
+        return $this->type;
     }
 
     public function getSlot() : Int{
