@@ -6,9 +6,7 @@ use pocketmine\math\Vector3;
 
 use pocketmine\player\Player;
 
-use DayKoala\inventory\Window;
-
-class DoubleChestWindow extends Window{
+class DoubleChestWindow extends CustomWindow{
 
     protected $pair = null;
 

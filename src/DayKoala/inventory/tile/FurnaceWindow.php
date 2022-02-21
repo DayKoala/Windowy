@@ -16,26 +16,26 @@
 
 namespace DayKoala\inventory\tile;
 
+use pocketmine\player\Player;
+
 use pocketmine\network\mcpe\protocol\ContainerSetDataPacket;
 
-use DayKoala\inventory\Window;
-
-class FurnaceWindow extends Window{
+class FurnaceWindow extends CustomWindow{
 
     public function setSmeltTime(Int $time) : Void{
-        if($this->closed === false):
+        if($this->holder instanceof Player):
            $this->holder->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_SMELT_PROGRESS, $time);
         endif;
     }
 
     public function setMaxFuelTime(Int $time) : Void{
-        if($this->closed === false):
+        if($this->holder instanceof Player):
            $this->holder->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_MAX_FUEL_TIME, $time);
         endif;
     }
 
     public function setRemaningFuelTime(Int $time) : Void{
-        if($this->closed === false):
+        if($this->holder instanceof Player):
            $this->holder->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_REMAINING_FUEL_TIME, $time);
         endif;
     }

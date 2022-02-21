@@ -31,9 +31,8 @@ trait WindowTrait{
 
     protected $holder = null;
     protected $position = null;
-    protected $pair = null;
 
-    protected $name = null;
+    public $name = null;
 
     public function getNetworkType() : Int{
         return $this->network;
@@ -52,7 +51,7 @@ trait WindowTrait{
     }
 
     public function setHolder(Player $player) : self{
-        $this->holder = $holder;
+        $this->holder = $player;
         return $this;
     }
 
@@ -69,8 +68,8 @@ trait WindowTrait{
         return (Bool) $this->name;
     }
 
-    public function getName() : String{
-        return $this->name ?? "Unknown";
+    public function getName() : ?String{
+        return $this->name ?? null;
     }
 
     public function setName(String $name) : self{
