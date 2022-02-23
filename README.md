@@ -18,18 +18,28 @@
 
 ```php
 
-use DayKoala\inventory\WindowFactory;
+use DayKoala\inventory\WindowIds;
 
-$id = WindowFactory::CHEST;
-$id = WindowFactory::DOUBLE_CHEST;
-$id = WindowFactory::FURNACE;
-$id = WindowFactory::HOPPER;
+$id = WindowIds::CHEST;
+$id = WindowIds::DOUBLE_CHEST;
+$id = WindowIds::FURNACE;
+$id = WindowIds::HOPPER;
 
 ```
 
 - You can get the desired inventory using:
 
 ```php
+
+use DayKoala\inventory\WindowFactory;
+
+/**
+ *
+ * @param String $id
+ * @param String|null $name
+ * @return SimpleWindow|null
+ * 
+ */
 
 $window = WindowFactory::getInstance()->get($id, $name);
 
@@ -55,13 +65,34 @@ $window = Windowy::getWindow($id, $name);
 
 use DayKoala\block\BlockEntityMetadata;
 
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
+
+use pocketmine\block\tile\Tile;
+use pocketmine\block\BlockLegacyIds;
+
+/**
+ *
+ * @param Int $network
+ * @param Int $size
+ * @param BlockEntityMetadata $metadata
+ * 
+ */
+
 $window = new MyWindow(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Tile::class, BlockLegacyIds::Block));
 
 ```
 
 ```php
 
-WindowFactory::register('MyWindow', $window);
+/**
+ *
+ * @param String $id
+ * @param SimpleWindow $inventory
+ * @param boolean $override
+ * 
+ */
+
+WindowFactory::register('MyWindow', $window, $override);
 
 ```
 
@@ -73,13 +104,20 @@ WindowFactory::register('MyWindow', $window);
 
 use DayKoala\inventory\action\WindowTransaction;
 
-$transaction = function(WindowTransaction $action){
+$callback = function(WindowTransaction $action){
    $player = $action->getPlayer();
    $player->sendMessage("I won't let you take this item haha!");
    $action->cancel();
 };
 
-$window->setTransaction($transaction);
+/**
+ *
+ * @param Closure $callback
+ * @return self
+ * 
+ */
+
+$window->setTransaction($callback);
 
 ```
 
@@ -87,7 +125,7 @@ $window->setTransaction($transaction);
 
 ```php
 
-$window->setItem($slot, $item, $transaction);
+$window->setItem($slot, $item, $callback);
 
 ```
 
@@ -95,8 +133,40 @@ or
 
 ```php
 
-$window->setItemTransaction($item, $transaction);
+/**
+ *
+ * @param Item $item
+ * @param Closure $callback
+ * @return self
+ * 
+ */
+
+$window->setItemCallback($item, $transaction);
 
 ```
 
 - If the ``transaction is not canceled`` and the item moved from its defined slot, the ``item's action will be removed``.
+
+# Closing your Window Differently
+
+- Usually we need to do things in a different way and ``closing a window`` with a different action can help you, so you can ``add an action`` when closing it using:
+
+```php
+
+use DayKoala\inventory\action\WindowAction;
+
+$callback = function(WindowAction $action){
+   $player = $action->getPlayer();
+   $player->sendMessage("Closing...");
+};
+
+/**
+ *
+ * @param Closure $callback
+ * @return self
+ * 
+ */
+
+$window->setCloseCallback($callback);
+
+```

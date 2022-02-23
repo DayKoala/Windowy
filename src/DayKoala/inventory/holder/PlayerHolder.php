@@ -20,6 +20,8 @@ use pocketmine\player\Player;
 
 interface PlayerHolder{
 
+    public function hasHolder() : Bool;
+
     public function getHolder() : ?Player;
 
     public function setHolder(Player $player); 

@@ -47,21 +47,21 @@ trait WindowCallbacksTrait{
     }
 
     public function hasItemCallback(Item $item) : Bool{
-        return isset($this->itemCallback[json_encode($item->jsonSerialize())]);
+        return isset($this->itemCallback[$item->__toString()]);
     }
 
     public function getItemCallback(Item $item) : ?Closure{
-        return $this->itemCallback[json_encode($item->jsonSerialize())] ?? null;
+        return $this->itemCallback[$item->__toString()] ?? null;
     }
-
+    
     public function setItemCallback(Item $item, Closure $callback) : self{
-        $this->itemCallback[json_encode($item->jsonSerialize())] = $callback;
+        $this->itemCallback[$item->__toString()] = $callback;
         return $this;
     }
 
     public function removeItemCallBack(Item $item) : self{
-        if(isset($this->itemCallback[json_encode($item->jsonSerialize())])){
-           unset($this->itemCallback[json_encode($item->jsonSerialize())]);
+        if(isset($this->itemCallback[$item->__toString()])){
+           unset($this->itemCallback[$item->__toString()]);
         }
         return $this;
     }

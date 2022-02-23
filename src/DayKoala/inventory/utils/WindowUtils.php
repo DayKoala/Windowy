@@ -27,8 +27,9 @@ use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 
 use DayKoala\inventory\SimpleWindow;
-
 use DayKoala\inventory\WindowFactory;
+
+use DayKoala\inventory\utils\WindowUtils;
 
 final class WindowUtils{
 
