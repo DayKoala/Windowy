@@ -29,7 +29,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use DayKoala\inventory\SimpleWindow;
 use DayKoala\inventory\WindowFactory;
 
-use DayKoala\inventory\utils\WindowUtils;
+use DayKoala\inventory\WindowIds;
 
 final class WindowUtils{
 
