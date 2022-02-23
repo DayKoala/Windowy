@@ -51,7 +51,7 @@ class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHol
         if($this->holder instanceof Player) $this->holder->removeCurrentWindow();
     }
 
-    public function onLoad(Player $who) : Void{
+    public function onCreate(Player $who) : Bool{
         $pos = $who->getPosition();
 
         $pos->x = $pos->getFloorX();
@@ -68,9 +68,11 @@ class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHol
         $packets = $this->metadata->create($pos, $pair, $this->name);
 
         foreach($packets as $packet) $who->getNetworkSession()->sendDataPacket($packet);
+
+        return true;
     }
 
-    public function onUnLoad(Player $who) : Void{
+    public function onRemove(Player $who) : Bool{
         if($this->position){
            
            $pair = null;
@@ -81,8 +83,11 @@ class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHol
            $packets = $this->metadata->remove($this->position, $pair);
 
            foreach($packets as $packet) $who->getNetworkSession()->sendDataPacket($packet);
+
         }
         $this->position = null;
+        $this->holder = null;
+        return true;
     }
 
     public function onOpen(Player $who) : Void{

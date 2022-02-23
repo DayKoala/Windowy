@@ -53,7 +53,7 @@ trait WindowCallbacksTrait{
     public function getItemCallback(Item $item) : ?Closure{
         return $this->itemCallback[ItemSerializer::serialize($item)] ?? null;
     }
-
+    
     public function setItemCallback(Item $item, Closure $callback) : self{
         $this->itemCallback[ItemSerializer::serialize($item)] = $callback;
         return $this;

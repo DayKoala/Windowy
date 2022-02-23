@@ -46,6 +46,10 @@ trait WindowTrait{
         return $this->metadata;
     }
 
+    public function hasHolder() : Bool{
+        return (Bool) $this->holder;
+    }
+
     public function getHolder() : ?Player{
         return $this->holder;
     }

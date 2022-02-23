@@ -1,95 +1,75 @@
 <?php
 
+/*
+ *  __          ___           _                     
+ *  \ \        / (_)         | |                    
+ *   \ \  /\  / / _ _ __   __| | _____      ___   _ 
+ *    \ \/  \/ / | | '_ \ / _` |/ _ \ \ /\ / / | | |
+ *     \  /\  /  | | | | | (_| | (_) \ V  V /| |_| |
+ *      \/  \/   |_|_| |_|\__,_|\___/ \_/\_/  \__, |
+ *                                             __/ |
+ *                                            |___/ 
+ *  @author DayKoala
+ *  @link https://github.com/DayKoala/Windowy
+ * 
+ */
+
 namespace DayKoala;
 
 use pocketmine\plugin\PluginBase;
 
-use pocketmine\event\Listener;
-
-use pocketmine\event\inventory\InventoryOpenEvent;
-use pocketmine\event\inventory\InventoryCloseEvent;
-use pocketmine\event\inventory\InventoryTransactionEvent;
-
-use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\player\Player;
 
 use DayKoala\inventory\SimpleWindow;
-
 use DayKoala\inventory\WindowFactory;
 
 use DayKoala\inventory\utils\WindowUtils;
 
-use DayKoala\inventory\action\WindowTransaction;
+use DayKoala\scheduler\WindowWait;
 
-class Windowy extends PluginBase implements Listener{
+class Windowy extends PluginBase{
+
+    private static $instance = null;
 
     public static function getWindow(String $id, ?String $name = null) : ?SimpleWindow{
         return WindowFactory::getInstance()->get($id, $name);
     }
 
+    protected $wait = [];
+
     public function onLoad() : Void{
+        self::$instance = $this;
+
         WindowUtils::init();
     }
 
     public function onEnable() : Void{
-        $this->getServer()->getPluginManager()->registerEvents($this, $this);
+        $this->getServer()->getPluginManager()->registerEvents(new WindowListener($this), $this);
     }
 
-    public function onOpen(InventoryOpenEvent $event){
-        if($event->isCancelled()){
-           return;
-        }
-        $inventory = $event->getInventory();
-        if(!$inventory instanceof SimpleWindow){
-           return;
-        }
-        $player = $event->getPlayer();
-        if(WindowUtils::hasCallback($player) === false){
-           WindowUtils::addCallback($player);
-        }
-        $inventory->onLoad($player);
+    public function inWindowWait(Player $player) : Bool{
+        return isset($this->wait[$player->getXuid()]);
     }
 
-    public function onClose(InventoryCloseEvent $event){
-        $inventory = $event->getInventory();
-        if(!$inventory instanceof SimpleWindow){
+    public function addWindowWait(Player $player, SimpleWindow $inventory) : Void{
+        if(isset($this->wait[$player->getXuid()])){
            return;
         }
-        $inventory->onUnLoad($event->getPlayer());
+        $current = $player->getCurrentWindow();
+        if($current instanceof SimpleWindow){
+           $current->onRemove($player);
+        }
+        $this->wait[$player->getXuid()] = $this->getScheduler()->scheduleRepeatingTask(new WindowWait($player, $inventory), 5);
     }
 
-    public function onTransaction(InventoryTransactionEvent $event){
-        foreach($event->getTransaction()->getActions() as $action):
+    public function removeWindowWait(Player $player) : Void{
+        if(isset($this->wait[$player->getXuid()])):
 
-            if(!$action instanceof SlotChangeAction){
-               continue;
-            }
-            $inventory = $action->getInventory();
-            if(!$inventory instanceof SimpleWindow){
-               continue;
-            }
-            $target = $action->getTargetItem();
-            $source = $action->getSourceItem();
-            if($inventory->hasItemCallback($target)){
+           $task = $this->wait[$player->getXuid()];
+           $task->cancel();
 
-               $callback = $inventory->getItemCallback($target);
-               $type = WindowTransaction::TARGET_ITEM_ACTION;
-
-            }elseif($inventory->hasItemCallback($source)){
-
-               $callback = $inventory->getItemCallback($source);
-               $type = WindowTransaction::SOURCE_ITEM_ACTION;
-
-            }else{
-
-               $callback = $inventory->getTransaction();
-               $type = WindowTransaction::INVENTORY_ACTION;
-
-            }
-            if($callback) $callback(new WindowTransaction($inventory, $event->getTransaction()->getSource(), $action, $event, $type));
-
-            break;
-
-        endforeach;
+           unset($this->wait[$player->getXuid()]);
+        endif;
     }
 
 }

@@ -62,10 +62,11 @@ final class WindowFactory{
         if(isset($this->windows[$id]) === false){
            return null;
         }
-        $window = clone $this->windows[$id];
-
-        if(is_string($name)) $window->setName($name);
-        
+        $window = $this->windows[$id];
+        $window = new $window($window->getNetworkType(), $window->getDefaultSize(), $window->getMetadata());
+        if(is_string($name)){
+           $window->setName($name);
+        }
         return $window;
     }
 
