@@ -63,13 +63,13 @@ class Windowy extends PluginBase{
     }
 
     public function removeWindowWait(Player $player) : Void{
-        if(isset($this->wait[$player->getXuid()])):
+        if(isset($this->wait[$player->getXuid()])) {
 
            $task = $this->wait[$player->getXuid()];
            $task->cancel();
 
            unset($this->wait[$player->getXuid()]);
-        endif;
+        }
     }
 
 }
