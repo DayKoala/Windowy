@@ -34,6 +34,8 @@ use pocketmine\block\BlockLegacyIds;
 
 use pocketmine\player\Player;
 
+use DayKoala\inventory\utils\WindowUtils;
+
 use DayKoala\inventory\tile\CustomWindow;
 
 use DayKoala\block\BlockEntityMetadata;
@@ -48,6 +50,8 @@ final class WindowFactory{
     private array $windows = [];
 
     public function __construct(){
+        WindowUtils::init();
+
         $this->register(WindowIds::CHEST, new CustomWindow(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
         $this->register(WindowIds::DOUBLE_CHEST, new DoubleChestWindow(WindowTypes::CONTAINER, 54, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
         $this->register(WindowIds::HOPPER, new CustomWindow(WindowTypes::HOPPER, 5, new BlockEntityMetadata(Hopper::class, BlockLegacyIds::HOPPER_BLOCK)));
@@ -58,15 +62,17 @@ final class WindowFactory{
         return isset($this->windows[$id]);
     }
 
-    public function get(String $id, ?String $name = null) : ?SimpleWindow{
+    public function get(String $id, ?String $name = null, Bool $clone = true) : ?SimpleWindow{
         if(isset($this->windows[$id]) === false){
            return null;
         }
         $window = $this->windows[$id];
-        $window = new $window($window->getNetworkType(), $window->getDefaultSize(), $window->getMetadata());
-        if(is_string($name)){
-           $window->setName($name);
+        if($clone){
+           $window = $window->getClonedInventory();
         }
+
+        if(is_string($name)) $window->setName($name);
+        
         return $window;
     }
 

@@ -30,15 +30,11 @@ use DayKoala\inventory\SimpleWindow;
 
 use DayKoala\inventory\utils\WindowUtils;
 
+use DayKoala\scheduler\WindowWait;
+
 use DayKoala\inventory\action\WindowTransaction;
 
 class WindowListener implements Listener{
-
-    private $plugin;
-
-    public function __construct(Windowy $plugin){
-        $this->plugin = $plugin;
-    }
 
     public function onOpen(InventoryOpenEvent $event){
         $inventory = $event->getInventory();
@@ -46,21 +42,21 @@ class WindowListener implements Listener{
            return;
         }
         $player = $event->getPlayer();
-        if($this->plugin->inWindowWait($player, $inventory)):
+        if(WindowWait::inWait($player)){
            if(WindowUtils::hasCallback($player) === false){
               WindowUtils::addCallback($player);
            }
-           if($inventory->onCreate($player) === false){
-              $event->cancel();  
-           }
-           $this->plugin->removeWindowWait($player);
-        else:
+           $wait = WindowWait::getWait($player);
+
+           if($wait->isCreated() === false) $event->cancel();
+
+        }else{
            if($event->isCancelled()){
               return;
            }
-           $this->plugin->addWindowWait($player, $inventory);
+           WindowWait::addWait($player, $inventory);
            $event->cancel();
-        endif;
+        }
     }
 
     public function onClose(InventoryCloseEvent $event){
@@ -105,7 +101,7 @@ class WindowListener implements Listener{
 
    public function onQuit(PlayerQuitEvent $event){
        $player = $event->getPlayer();
-       if($this->plugin->inWindowWait($player)) $this->plugin->removeWindowWait($player);
+       if(WindowWait::inWait($player)) WindowWait::cancelWait($player);
    }
 
 }

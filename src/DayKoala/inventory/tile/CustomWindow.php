@@ -32,7 +32,7 @@ class CustomWindow extends SimpleWindow{
 
     use WindowCallbacksTrait;
 
-    public function setItem(Int $index, Item $item, Closure $callback = null) : Void{
+    public function setItem(Int $index, Item $item, ?Closure $callback = null) : Void{
         $target = $this->getItem($index);
 
         if($target->equalsExact($item) === false){
@@ -61,6 +61,12 @@ class CustomWindow extends SimpleWindow{
         $callback = $this->closeCallback;
 
         if($callback) $callback(new WindowAction($this, $who));
+    }
+
+    public function getClonedInventory() : self{
+        $window = parent::getClonedInventory();
+        $window->copyCallbacks($this);
+        return $window;
     }
 
 }

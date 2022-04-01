@@ -27,8 +27,6 @@ use DayKoala\inventory\WindowTrait;
 
 use DayKoala\block\BlockEntityMetadata;
 
-use DayKoala\inventory\tile\DoubleChestWindow;
-
 class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHolder{
 
     use WindowTrait;
@@ -60,32 +58,20 @@ class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHol
 
         $this->position = $pos;
 
-        $pair = null;
-        if($this instanceof DoubleChestWindow){
-           $this->setPair($pair = (clone $pos)->add(1, 0, 0));
+        foreach($this->metadata->create($pos, null, $this->name) as $packet){
+           $who->getNetworkSession()->sendDataPacket($packet);
         }
-
-        $packets = $this->metadata->create($pos, $pair, $this->name);
-
-        foreach($packets as $packet) $who->getNetworkSession()->sendDataPacket($packet);
 
         return true;
     }
 
     public function onRemove(Player $who) : Bool{
         if($this->position){
-           
-           $pair = null;
-           if($this instanceof DoubleChestWindow){
-              $pair = $this->getPair();
+           foreach($this->metadata->remove($this->position) as $packet){
+              $who->getNetworkSession()->sendDataPacket($packet);
            }
-
-           $packets = $this->metadata->remove($this->position, $pair);
-
-           foreach($packets as $packet) $who->getNetworkSession()->sendDataPacket($packet);
-
+           $this->position = null;
         }
-        $this->position = null;
         $this->holder = null;
         return true;
     }
@@ -104,12 +90,20 @@ class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHol
         $this->closed = true;
     }
 
-    public function isClosed() : Bool{
-        return $this->closed;
+    public function getClonedInventory() : self{
+        $window = new static($this->network, $this->size, $this->metadata);
+        if(($contents = $this->getContents()) !== null){
+           $window->setContents($contents);
+        }
+        return $window;
     }
 
     public function getInventory() : self{
         return $this;
+    }
+
+    public function isClosed() : Bool{
+        return $this->closed;
     }
 
 }

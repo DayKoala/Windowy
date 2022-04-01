@@ -20,6 +20,8 @@ use Closure;
 
 use pocketmine\item\Item;
 
+use DayKoala\inventory\tile\CustomWindow;
+
 trait WindowCallbacksTrait{
 
     protected $closeCallback = null;
@@ -44,6 +46,14 @@ trait WindowCallbacksTrait{
     public function removeCloseCallback() : self{
         $this->closeCallback = null;
         return $this;
+    }
+
+    public function hasItemCallbacks() : Bool{
+        return (Bool) $this->itemCallback;
+    }
+
+    public function getItemCallbacks() : Array{
+        return $this->itemCallback ?? [];
     }
 
     public function hasItemCallback(Item $item) : Bool{
@@ -82,6 +92,12 @@ trait WindowCallbacksTrait{
     public function removeTransaction() : self{
         $this->transaction = null;
         return $this;
+    }
+
+    public function copyCallbacks(CustomWindow $window) : Void{
+        if($window->hasTransaction()) $this->transaction = $window->getTransaction();
+        if($window->hasCloseCallback()) $this->closeCallback = $window->getCloseCallback();
+        if($window->hasItemCallbacks()) $this->itemCallback = $window->getItemCallbacks();
     }
 
 }

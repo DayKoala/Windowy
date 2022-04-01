@@ -18,58 +18,31 @@ namespace DayKoala;
 
 use pocketmine\plugin\PluginBase;
 
+use pocketmine\scheduler\TaskScheduler;
+
 use pocketmine\player\Player;
 
 use DayKoala\inventory\SimpleWindow;
 use DayKoala\inventory\WindowFactory;
 
-use DayKoala\inventory\utils\WindowUtils;
-
-use DayKoala\scheduler\WindowWait;
-
 class Windowy extends PluginBase{
 
-    private static $instance = null;
+    private static $scheduler = null;
 
-    public static function getWindow(String $id, ?String $name = null) : ?SimpleWindow{
-        return WindowFactory::getInstance()->get($id, $name);
+    public static function getTaskScheduler() : ?TaskScheduler{
+        return self::$scheduler;
     }
 
-    protected $wait = [];
+    public static function getWindow(String $id, ?String $name = null, Bool $clone = true) : ?SimpleWindow{
+        return WindowFactory::getInstance()->get($id, $name, $clone);
+    }
 
     public function onLoad() : Void{
-        self::$instance = $this;
-
-        WindowUtils::init();
+        self::$scheduler = $this->getScheduler();
     }
 
     public function onEnable() : Void{
-        $this->getServer()->getPluginManager()->registerEvents(new WindowListener($this), $this);
-    }
-
-    public function inWindowWait(Player $player) : Bool{
-        return isset($this->wait[$player->getXuid()]);
-    }
-
-    public function addWindowWait(Player $player, SimpleWindow $inventory) : Void{
-        if(isset($this->wait[$player->getXuid()])){
-           return;
-        }
-        $current = $player->getCurrentWindow();
-        if($current instanceof SimpleWindow){
-           $current->onRemove($player);
-        }
-        $this->wait[$player->getXuid()] = $this->getScheduler()->scheduleRepeatingTask(new WindowWait($player, $inventory), 5);
-    }
-
-    public function removeWindowWait(Player $player) : Void{
-        if(isset($this->wait[$player->getXuid()])):
-
-           $task = $this->wait[$player->getXuid()];
-           $task->cancel();
-
-           unset($this->wait[$player->getXuid()]);
-        endif;
+        $this->getServer()->getPluginManager()->registerEvents(new WindowListener(), $this);
     }
 
 }
