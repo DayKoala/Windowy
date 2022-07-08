@@ -10,7 +10,22 @@
 - **[Windowy](https://github.com/DayKoala/Windowy)** is a temporary inventory generator and manager, focused on item transactions, for
 **[PocketMine-MP](https://github.com/pmmp/PocketMine-MP)**.
 
-- Functional as a plugin, for multiple different tasks.
+- Functional as a Plugin and Library, for multiple different tasks.
+
+# WindowLibrary
+
+- WindowLibrary was created for direct tasks in plugins, follow the example of how to use below:
+
+```php
+
+# Do the following function in your Pluginbase to activate it.
+
+if(Windowy::hasHolder() === false){
+   Windowy::setHolder($this);
+}
+
+
+```
 
 # Getting a Window
 
@@ -59,7 +74,7 @@ $window = Windowy::getWindow($id, $name);
 
 # Registering your Window
 
-- You need the inventory you are going to register to be a ``Window extension``, otherwise it won't work. Register ``your inventory`` like this:
+- You need the inventory you are going to register to be a ``SimpleWindow extension``, otherwise it won't work. Register ``your inventory`` like this:
  
 ```php
 
@@ -141,7 +156,7 @@ or
  * 
  */
 
-$window->setItemCallback($item, $transaction);
+$window->setItemCallback($item, $callback);
 
 ```
 
