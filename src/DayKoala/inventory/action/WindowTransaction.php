@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 

@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
@@ -33,7 +34,7 @@ use DayKoala\inventory\WindowIds;
 
 final class WindowUtils{
 
-    private static $callback = null;
+    private static ?Closure $callback = null;
 
     public static function init(){
 

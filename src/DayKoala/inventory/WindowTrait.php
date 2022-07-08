@@ -11,28 +11,26 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
 namespace DayKoala\inventory;
 
-use pocketmine\player\Player;
-
-use pocketmine\world\Position;
-
 use DayKoala\block\BlockEntityMetadata;
+
+use DayKoala\world\WindowPosition;
 
 trait WindowTrait{
 
-    protected $network;
-    protected $size;
+    protected int $network;
+    protected int $size;
 
-    protected $metadata;
+    protected BlockEntityMetadata $metadata;
 
-    protected $holder = null;
-    protected $position = null;
+    protected ?WindowPosition $position = null;
 
-    public $name = null;
+    public ?string $name = null;
 
     public function getNetworkType() : Int{
         return $this->network;
@@ -46,26 +44,12 @@ trait WindowTrait{
         return $this->metadata;
     }
 
-    public function hasHolder() : Bool{
-        return (Bool) $this->holder;
+    public function hasPosition() : Bool{
+        return (Bool) $this->position;
     }
 
-    public function getHolder() : ?Player{
-        return $this->holder;
-    }
-
-    public function setHolder(Player $player) : self{
-        $this->holder = $player;
-        return $this;
-    }
-
-    public function getPosition() : ?Position{
+    public function getPosition() : ?WindowPosition{
         return $this->position;
-    }
-
-    public function setPosition(Position $pos) : self{
-        $this->position = $pos;
-        return $this;
     }
 
     public function hasName() : Bool{

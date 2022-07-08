@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
@@ -38,8 +39,7 @@ use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 
 class BlockEntityMetadata{
 
-    protected $tile;
-    protected $block;
+    protected $tile, $block;
 
     public function __construct(String $tile, Int $id, Int $meta = 0){
         $this->tile = TileFactory::getInstance()->getSaveId($tile);

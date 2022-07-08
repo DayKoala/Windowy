@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
@@ -19,8 +20,6 @@ namespace DayKoala;
 use pocketmine\plugin\PluginBase;
 
 use pocketmine\scheduler\TaskScheduler;
-
-use pocketmine\player\Player;
 
 use DayKoala\inventory\SimpleWindow;
 use DayKoala\inventory\WindowFactory;

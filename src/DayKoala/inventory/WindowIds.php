@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
@@ -22,5 +23,7 @@ final class WindowIds{
     public const DOUBLE_CHEST = "Double_Chest";
     public const HOPPER = "Hopper";
     public const FURNACE = "Furnace";
+
+    private function __construct(){ /* NOPE */ }
     
 }

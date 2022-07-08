@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
@@ -18,12 +19,16 @@ namespace DayKoala\inventory\holder;
 
 use pocketmine\player\Player;
 
-interface PlayerHolder{
+trait PlayerHolder{
 
-    public function hasHolder() : Bool;
+    protected ?Player $holder = null;
 
-    public function getHolder() : ?Player;
+    public function hasHolder() : Bool{
+        return (Bool) $this->holder;
+    }
 
-    public function setHolder(Player $player); 
+    public function getHolder() : ?Player{
+        return $this->holder;
+    }
 
 }

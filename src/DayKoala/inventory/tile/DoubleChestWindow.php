@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
@@ -18,21 +19,16 @@ namespace DayKoala\inventory\tile;
 
 use pocketmine\player\Player;
 
-use pocketmine\math\Vector3;
+use DayKoala\world\WindowPosition;
 
 class DoubleChestWindow extends CustomWindow{
 
-    protected $pair = null;
+    protected ?WindowPosition $pair = null;
 
     public function onCreate(Player $who) : Bool{
-        $pos = $who->getPosition();
 
-        $pos->x = $pos->getFloorX();
-        $pos->y = $pos->getFloorY() + 3;
-        $pos->z = $pos->getFloorZ();
-
-        $this->position = $pos;
-        $this->pair = $pos->add(1, 0, 0);
+        $this->position = $pos = (new WindowPosition($who->getPosition()))->wadd(0, 3);
+        $this->pair = $pos->wadd(1);
 
         foreach($this->metadata->create($pos, $this->pair, $this->name) as $packet){
            $who->getNetworkSession()->sendDataPacket($packet);
@@ -57,13 +53,8 @@ class DoubleChestWindow extends CustomWindow{
         return (Bool) $this->pair;
     }
 
-    public function getPair() : ?Vector3{
+    public function getPair() : ?WindowPosition{
         return $this->pair;
-    }
-
-    public function setPair(Vector3 $pos) : self{
-        $this->pair = $pos;
-        return $this;
     }
 
 }

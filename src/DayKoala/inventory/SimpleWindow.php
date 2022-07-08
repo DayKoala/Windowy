@@ -11,13 +11,13 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
 namespace DayKoala\inventory;
 
 use pocketmine\inventory\SimpleInventory;
-use pocketmine\inventory\InventoryHolder;
 
 use pocketmine\player\Player;
 
@@ -27,9 +27,11 @@ use DayKoala\inventory\WindowTrait;
 
 use DayKoala\block\BlockEntityMetadata;
 
-class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHolder{
+use DayKoala\world\WindowPosition;
 
-    use WindowTrait;
+class SimpleWindow extends SimpleInventory{
+
+    use PlayerHolder, WindowTrait;
 
     protected bool $closed = true;
 
@@ -50,13 +52,7 @@ class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHol
     }
 
     public function onCreate(Player $who) : Bool{
-        $pos = $who->getPosition();
-
-        $pos->x = $pos->getFloorX();
-        $pos->y = $pos->getFloorY() + 3;
-        $pos->z = $pos->getFloorZ();
-
-        $this->position = $pos;
+        $this->position = $pos = (new WindowPosition($who->getPosition()))->wadd(0, 3);
 
         foreach($this->metadata->create($pos, null, $this->name) as $packet){
            $who->getNetworkSession()->sendDataPacket($packet);
@@ -96,10 +92,6 @@ class SimpleWindow extends SimpleInventory implements InventoryHolder, PlayerHol
            $window->setContents($contents);
         }
         return $window;
-    }
-
-    public function getInventory() : self{
-        return $this;
     }
 
     public function isClosed() : Bool{

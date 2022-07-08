@@ -11,18 +11,11 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
 namespace DayKoala\inventory;
-
-use Closure;
-
-use pocketmine\utils\SingletonTrait;
-
-use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
-
-use pocketmine\network\mcpe\protocol\types\BlockPosition;
 
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 
@@ -31,8 +24,6 @@ use pocketmine\block\tile\NormalFurnace;
 use pocketmine\block\tile\Hopper;
 
 use pocketmine\block\BlockLegacyIds;
-
-use pocketmine\player\Player;
 
 use DayKoala\inventory\utils\WindowUtils;
 
@@ -45,11 +36,15 @@ use DayKoala\inventory\tile\DoubleChestWindow;
 
 final class WindowFactory{
 
-    use SingletonTrait;
+    private static $instance = null;
+
+    public static function getInstance() : self{
+        return self::$instance ?? (self::$instance = new self());
+    }
 
     private array $windows = [];
 
-    public function __construct(){
+    private function __construct(){
         WindowUtils::init();
 
         $this->register(WindowIds::CHEST, new CustomWindow(WindowTypes::CONTAINER, 27, new BlockEntityMetadata(Chest::class, BlockLegacyIds::CHEST)));
@@ -66,6 +61,7 @@ final class WindowFactory{
         if(isset($this->windows[$id]) === false){
            return null;
         }
+
         $window = $this->windows[$id];
         if($clone){
            $window = $window->getClonedInventory();

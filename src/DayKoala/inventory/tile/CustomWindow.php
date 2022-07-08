@@ -11,6 +11,7 @@
  *                                            |___/ 
  *  @author DayKoala
  *  @link https://github.com/DayKoala/Windowy
+ *  @social https://twitter.com/DayKoala
  * 
  */
 
@@ -65,7 +66,7 @@ class CustomWindow extends SimpleWindow{
 
     public function getClonedInventory() : self{
         $window = parent::getClonedInventory();
-        $window->copyCallbacks($this);
+        $window->copyCallbacks($this->transaction, $this->closeCallback, $this->itemCallback);
         return $window;
     }
 
