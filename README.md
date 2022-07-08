@@ -18,7 +18,7 @@
 
 ```php
 
-# Do the following function in your Pluginbase to activate it.
+# Do the following function in your PluginBase to activate it (WindowLibrary).
 
 if(Windowy::hasHolder() === false){
    Windowy::setHolder($this);
