@@ -12,9 +12,9 @@
 
 - Functional as a Plugin and Library, for multiple different tasks.
 
-# WindowLibrary
+# WindowyLibrary
 
-- WindowLibrary was created for direct tasks in plugins, follow the example of how to use below:
+- WindowyLibrary was created for direct tasks in plugins, follow the example of how to use below:
 
 ```php
 
