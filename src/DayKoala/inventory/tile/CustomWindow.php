@@ -64,7 +64,7 @@ class CustomWindow extends SimpleWindow{
         if($callback) $callback(new WindowAction($this, $who));
     }
 
-    public function getClonedInventory() : self{
+    public function getClonedInventory() : static{
         $window = parent::getClonedInventory();
         $window->copyCallbacks($this->transaction, $this->closeCallback, $this->itemCallback);
         return $window;

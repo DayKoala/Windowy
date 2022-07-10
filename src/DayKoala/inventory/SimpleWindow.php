@@ -35,7 +35,7 @@ class SimpleWindow extends SimpleInventory{
 
     protected bool $closed = true;
 
-    public function __construct(Int $network, Int $size, BlockEntityMetadata $metadata){
+    final public function __construct(Int $network, Int $size, BlockEntityMetadata $metadata){
         $this->size = $size;
         parent::__construct($size);
 
@@ -86,7 +86,7 @@ class SimpleWindow extends SimpleInventory{
         $this->closed = true;
     }
 
-    public function getClonedInventory() : self{
+    public function getClonedInventory() : static{
         $window = new static($this->network, $this->size, $this->metadata);
         if(($contents = $this->getContents()) !== null){
            $window->setContents($contents);

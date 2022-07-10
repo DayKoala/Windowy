@@ -35,6 +35,8 @@ use DayKoala\scheduler\WindowWait;
 
 use DayKoala\inventory\action\WindowTransaction;
 
+use DayKoala\inventory\tile\CustomWindow;
+
 class WindowListener implements Listener{
 
     public function onOpen(InventoryOpenEvent $event){
@@ -72,9 +74,10 @@ class WindowListener implements Listener{
               continue;
            }
            $inventory = $action->getInventory();
-           if(!$inventory instanceof SimpleWindow){
+           if(!$inventory instanceof CustomWindow){
               continue;
            }
+
            $target = $action->getTargetItem();
            $source = $action->getSourceItem();
            if($inventory->hasItemCallback($target)){

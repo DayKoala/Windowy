@@ -34,6 +34,8 @@ class WindowTransaction extends WindowAction{
     public const TARGET_ITEM_ACTION = 1;
     public const SOURCE_ITEM_ACTION = 2;
 
+    protected int $slot;
+
     protected Item $target;
     protected Item $source;
 
