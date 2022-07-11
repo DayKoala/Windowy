@@ -25,19 +25,19 @@ class FurnaceWindow extends CustomWindow{
 
     public function setSmeltTime(Int $time) : Void{
         if($this->holder instanceof Player):
-           $this->holder->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_SMELT_PROGRESS, $time);
+           $this->holder->getNetworkSession()->getInvManager()->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_SMELT_PROGRESS, $time);
         endif;
     }
 
     public function setMaxFuelTime(Int $time) : Void{
         if($this->holder instanceof Player):
-           $this->holder->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_MAX_FUEL_TIME, $time);
+           $this->holder->getNetworkSession()->getInvManager()->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_MAX_FUEL_TIME, $time);
         endif;
     }
 
     public function setRemaningFuelTime(Int $time) : Void{
         if($this->holder instanceof Player):
-           $this->holder->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_REMAINING_FUEL_TIME, $time);
+           $this->holder->getNetworkSession()->getInvManager()->syncData($this, ContainerSetDataPacket::PROPERTY_FURNACE_REMAINING_FUEL_TIME, $time);
         endif;
     }
 

@@ -33,7 +33,7 @@ trait WindowCallbacksTrait{
         return (Bool) $this->closeCallback;
     }
 
-    public function getCloseCallback() : Bool{
+    public function getCloseCallback() : ?Closure{
         return $this->closeCallback;
     }
 
@@ -94,7 +94,7 @@ trait WindowCallbacksTrait{
     }
 
     public function copyCallbacks(?Closure $transaction = null, ?Closure $closeCallback = null, ?Array $itemCallback = []) : Void{
-        $this->transanction = $transaction;
+        $this->transaction = $transaction;
         $this->closeCallback = $closeCallback;
         $this->itemCallback = $itemCallback;
     }
